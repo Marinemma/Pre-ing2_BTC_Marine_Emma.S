@@ -1,1 +1,37 @@
+# create function 
+def displayfile(filepath, outpath) :
+    
+    #open file in read-only mode
+    fd1 = open(filepath, 'r')
+    #open file in write-only mode
+    fd2 = open(outpath, 'w')
+    line = "   "
 
+    
+    #read the first line
+    line = fd1.readline()
+    # split the first line
+    value_list = line.split(';')
+    # filter and retrieve the columns we want
+    filterlist = [value_list[2]] + [value_list[4]] + [value_list[5]] + [value_list[7]] + [value_list[8]]
+    result = ";".join(filterlist)
+    #retrieve the first line
+    fd2.write(result + "\n")
+    
+    
+    # retrieve all next lines
+    for line in fd1:
+        #remove the new_line character and split
+        line = line.replace('\n','')
+        value_list = line.split(';')
+
+        # retrieve sample type 'fecal' and filter the columns we want
+        sample_type = value_list[2]
+        if sample_type == "fecal":
+            filterlist = [value_list[2]] + [value_list[4]] + [value_list[5]] + [value_list[7]] + [value_list[8]]
+            result = ";".join(filterlist)
+            fd2.write(result + "\n")
+    #close file stream       
+    fd1.close()
+
+displayfile('data_real.csv', 'value_fecal.csv')
