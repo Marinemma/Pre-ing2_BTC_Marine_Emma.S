@@ -66,8 +66,9 @@ colors = {"placebo" : "cadetblue", "ABX" : "lightcoral"}
 #create legend
 #source : https://www.python-simple.com/python-matplotlib/configuration-axes.php
 #source : https://youtube.com/playlist?list=PLjrnnc4BZaRCR5eOXSTAgKJpBl62Y7o45&si=DajNc1bGfO4dArFK
-axes.scatter([], [], color = 'cadetblue', label = "Placebo", marker = "s", s = 100) #s=100 is the size of the legend, label is the title of this legend
-axes.scatter([], [], color = 'lightsalmon', label = "ABX", marker = "s", s = 100) # "s" is for the square form off the legend
+axes.scatter([], [], color = 'cadetblue', label = "Placebo", marker = "s", s = 100) #s=100 is the size of the legend
+#label is the title of this legend
+axes.scatter([], [], color = 'lightsalmon', label = "ABX", marker = "s", s = 100) #"s" is for the square form off the legend
 #create grid
 #source : https://search.app/gS1v6HeNaWcCfs5b9
 axes.grid(True, linestyle='--')
