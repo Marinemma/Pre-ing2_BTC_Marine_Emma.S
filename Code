@@ -1,5 +1,29 @@
+#import library to create graphics and use mathematical function
+import matplotlib.pyplot as plt
+import math
+
+
+#copy the file to the folder
+def displayfile0(filepath, outpath) :
+    #open both file
+    fd = open(filepath, 'r')
+    fd0 = open(outpath, 'w')
+    line = '   '
+    #read and write the fisrt line
+    line = fd.readline()
+    fd0.write(line)
+    #read and write all the other lines
+    for line in fd :
+        line = fd.readline()
+        fd0.write(line)
+    #close the file
+    fd.close()
+#activates the function
+displayfile0('data_real.csv','input/data_real.csv')
+
+
 # create function 
-def displayfile(filepath, outpath) :
+def displayfile1(filepath, outpath) :
     
     #open file in read-only mode
     fd1 = open(filepath, 'r')
@@ -7,7 +31,6 @@ def displayfile(filepath, outpath) :
     fd2 = open(outpath, 'w')
     line = "   "
 
-    
     #read the first line
     line = fd1.readline()
     # split the first line
@@ -17,7 +40,6 @@ def displayfile(filepath, outpath) :
     result = ";".join(filterlist)
     #retrieve the first line
     fd2.write(result + "\n")
-    
     
     # retrieve all next lines
     for line in fd1:
@@ -34,4 +56,290 @@ def displayfile(filepath, outpath) :
     #close file stream       
     fd1.close()
 
-displayfile('data_real.csv', 'value_fecal.csv')
+displayfile1('input/data_real.csv', 'output/value_fecal.csv')
+
+
+#create graph data
+figure ,axes = plt.subplots()
+#chose colors
+colors = {"placebo" : "cadetblue", "ABX" : "lightcoral"}
+#create legend
+#source : https://www.python-simple.com/python-matplotlib/configuration-axes.php
+#source : https://youtube.com/playlist?list=PLjrnnc4BZaRCR5eOXSTAgKJpBl62Y7o45&si=DajNc1bGfO4dArFK
+axes.scatter([], [], color = 'cadetblue', label = "Placebo", marker = "s", s = 100) #s=100 is the size of the legend, label is the title of this legend
+axes.scatter([], [], color = 'lightsalmon', label = "ABX", marker = "s", s = 100) # "s" is for the square form off the legend
+#create grid
+#source : https://search.app/gS1v6HeNaWcCfs5b9
+axes.grid(True, linestyle='--')
+#choose the legend parameters
+axes.legend(loc='best', fontsize=10)
+
+#open the file
+fd2 = open("output/value_fecal.csv", 'r')
+
+#run through all lines
+mouse_ids = 0
+for line in fd2:
+    line = fd2.readline()
+    #remove new_line and ";" character
+    line = line.replace('\n', '')
+    value_list = line.split(';')
+    #skip the line if empty
+    if line == '':
+        break
+    #keep number of mouses
+    m_id = int(value_list[1].replace("ABX", ''))
+    # go to next line
+    mouse_ids = mouse_ids + 1
+
+#run through all mouses
+for mouse_id in range(mouse_ids) : 
+    x = []
+    y1 = []
+    fd2 = open("output/value_fecal.csv", 'r')
+    line = fd2.readline()
+    for line in fd2 :
+        line = line.replace('\n','')
+        value_list = line.split(';')
+
+        #group 
+        treatment = value_list[2]
+        if "ABX" in treatment:
+            group = "ABX"
+        else:
+            group = "placebo"
+        
+        m_id = int(value_list[1].replace("ABX",''))
+        #change the values in log() 
+        value_list[4] = math.log10(float(value_list[4]))
+        #fill X and Y values
+        if m_id == mouse_id :
+            x.append(float(value_list[3]))
+            y1.append(float(value_list[4]))   
+            #create graph
+            axes.plot(x, y1, color=colors[group])
+
+#close file
+fd2.close()
+
+#create legend
+axes.set_title("Fecal live bacteria")
+axes.set_ylabel("log10(live bacteria/wet g)")
+axes.set_xlabel("Washout day")
+
+#save graph
+figure.savefig("images/Fecal.png")
+plt.close(figure)
+
+
+#create function
+def displayfile2(filepath, outpath) :
+    #open file in read-only mode
+    fd3 = open(filepath, 'r')
+    #open file in write-only mode    
+    fd4 = open(outpath, 'w')
+    line = "   "
+
+    #read the first line    
+    line = fd3.readline()
+    #split and keep the colums we want of the fist line
+    value_list = line.split(';')
+    filterlist = [value_list[2]] + [value_list[5]] + [value_list[8]] + [value_list[9]]
+    result = ";".join(filterlist)
+    fd4.write(result + "\n")
+
+    #retrieve all next lines
+    for line in fd3:
+        line = line.replace('\n','')
+        value_list = line.split(';')
+
+        #keep ileal and 21 days old mouses values
+        sample_type = value_list[2]
+        mouse_age_days = int(value_list[9])
+        if sample_type == "ileal" and mouse_age_days == 21 :
+            filterlist = [value_list[2]] + [value_list[5]] + [value_list[8]] + [value_list[9]]
+            result = ";".join(filterlist)
+            fd4.write(result + "\n")
+
+    #close file
+    fd3.close
+displayfile2('input/data_real.csv', 'output/value_ileal.csv')
+
+
+#create empty list
+x  = []
+y1 = [] 
+y2 = [] 
+#create a counter
+index1 = 0
+#open the file
+fd4 = open('output/value_ileal.csv', 'r')
+#read the fisrt line
+line = fd4.readline()
+
+#run throught all the lines
+while line != '':
+    line = fd4.readline()
+    if line == '':
+        break
+    #split 
+    value_list = line.split(';')
+    #change str value to integers values in a column
+    treatment = value_list[1]
+    if "ABX" in treatment :
+        value_list[1]= 1
+    else: 
+        value_list[1]= 2
+    #add variable name to columns
+    value_list[2] = math.log10(float(value_list[2]))
+    nb_bacteries = value_list[2]
+    treatment   = value_list[1]
+    # fill X values
+    x.append(index1)
+    # fill Y values
+    y1.append(value_list[2])    
+    y2.append(value_list[1])
+    index1 += 1
+#close the file
+fd2.close()
+#group the data 
+grouped_data1 = {1: [], 2: []}
+for i in range(len(y2)):
+    grouped_data1[y2[i]].append(y1[i])
+#create graph
+figure, axes = plt.subplots()
+
+# set axes titles 
+axes.set_title('Ileal live bacteria', fontsize=15)
+axes.set_ylabel('log10(live bacteria/wet g)', fontsize=13)
+axes.set_xlabel('Treatment', fontsize=13)
+axes.set_xticklabels([])
+#set axes values and create violin graph
+x = axes.violinplot([grouped_data1[1], grouped_data1[2]])
+
+#set colors
+colors = ['lightsalmon', 'cadetblue'] 
+for i, color in enumerate(x['bodies']):
+    color.set_facecolor(colors[i])
+    color.set_edgecolor('black')
+    
+#create legend
+axes.scatter([], [], color = 'cadetblue', label = "Placebo", marker = "s", s = 80)
+axes.scatter([], [], color = 'lightsalmon', label = "ABX", marker = "s", s = 80)
+
+axes.grid(axis='y', linestyle='--')
+axes.legend(loc='lower right', fontsize=10)
+
+#create points on the graph
+#source : https://sites.google.com/view/aide-python/graphiques/les-graphiques-courbes-et-nuages-de-points-scatter-plot
+axes.scatter([2] * len(grouped_data1[2]), grouped_data1[2], color='cadetblue', label='Placebo', marker = "o", s = 20)
+axes.scatter([1] * len(grouped_data1[1]), grouped_data1[1], color='lightsalmon', label='ABX', marker = "o", s = 20)
+# save graph
+figure.savefig('images/Ileal.png')
+#close the graph
+plt.close(figure)
+
+
+#create function and open files in read and write mode
+def displayfile3(filepath, outpath) :
+    fd5 = open(filepath, 'r')
+    fd6 = open(outpath, 'w')
+    line = "   "
+
+    #retrieve first line
+    line = fd5.readline()
+    
+    #split the list
+    value_list = line.split(';')
+    #choose the values we keep
+    filterlist = [value_list[2]] + [value_list[5]] + [value_list[8]] + [value_list[9]]
+    #join the values and write in the file
+    result = ";".join(filterlist)
+    fd6.write(result + "\n")
+
+    #retrieve all next lines
+    for line in fd5:
+        line = line.replace('\n','')
+        value_list = line.split(';')
+        #keep cecal and 21 days old mouses values
+        sample_type = value_list[2]
+        mouse_age_days = int(value_list[9])
+        if sample_type == "cecal" and mouse_age_days == 21 :
+            filterlist = [value_list[2]] + [value_list[5]] + [value_list[8]] + [value_list[9]]
+            result = ";".join(filterlist)
+            fd6.write(result + "\n")
+    #close file
+    fd5.close
+#run the function
+displayfile3('input/data_real.csv', 'output/value_cecal.csv')
+
+
+#create empty list and a counter
+x  = []
+y1 = [] 
+y2 = [] 
+index2 = 0
+#open file and read first line
+fd6 = open('output/value_cecal.csv', 'r')
+line = fd6.readline()
+
+#read all the lines
+while line != '':
+    line = fd6.readline()
+    if line == '':
+        break
+    value_list = line.split(';')
+    #create unique values for ABX and Placebo
+    treatment = value_list[1]
+    if "ABX" in treatment :
+        value_list[1]= 1
+    else: 
+        value_list[1]=2
+
+    value_list[2] = math.log10(float(value_list[2]))
+    nb_bacteries = value_list[2]
+    treatment   = value_list[1]
+    # fill X values
+    x.append(index2)
+    # fill Y values
+    y1.append(value_list[2])    
+    y2.append(value_list[1])
+    index2 += 1
+#close file
+fd6.close()
+#group the data (here placebo and ABX)
+grouped_data2 = {1: [], 2: []}
+
+#fill Y values with group
+for i in range(len(y2)):
+    grouped_data2[y2[i]].append(y1[i])
+figure, axes = plt.subplots()
+
+# set titles
+axes.set_title('Cecal live bacteria', fontsize=15)
+axes.set_ylabel('log10(live bacteria/wet g)', fontsize=13)
+axes.set_xlabel('Treatment', fontsize=13)
+axes.set_xticklabels([])
+#create violin graph
+x = axes.violinplot([grouped_data2[1], grouped_data2[2]])
+
+#set graph colors
+colors = ['lightsalmon', 'cadetblue']
+for i, color in enumerate(x['bodies']):
+    color.set_facecolor(colors[i])
+    color.set_edgecolor('black')
+
+#set legend colors
+axes.scatter([], [], color = 'cadetblue', label = "Placebo", marker = "s", s = 80)
+axes.scatter([], [], color = 'lightsalmon', label = "ABX", marker = "s", s = 80)
+#create legend and grid
+axes.grid(axis='y', linestyle='--')
+axes.legend(loc='lower right', fontsize=10)
+
+#create points and their color
+axes.scatter([2] * len(grouped_data2[2]), grouped_data2[2], color='cadetblue', label="Placebo", marker = "o", s = 20)
+axes.scatter([1] * len(grouped_data2[1]), grouped_data2[1], color='lightsalmon', label="ABX", marker = "o", s = 20)
+# save graph
+figure.savefig("images/Cecal.png")
+#close graph
+plt.close(figure)
